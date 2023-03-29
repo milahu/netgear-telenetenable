@@ -54,6 +54,20 @@ def ByteSwap(data):
   a.byteswap()
   return a.tobytes()
 
+def hexdump(bytes):
+  line = ""
+  for i, b in enumerate(bytes):
+    if i % 16 != 0:
+      line += " "
+      if i % 8 == 0:
+        line += "   "
+    if i % 16 == 0 and i > 0:
+      print(line)
+      line = ""
+    line += f"{b:02x}"
+  if line != "":
+    print(line)
+
 def GeneratePayload(mac, username, password=""):
   # eventually reformat mac
   mac = mac.replace(":","").upper()
@@ -120,6 +134,8 @@ def main():
     password = args[3]
 
   payload = GeneratePayload(mac, username, password)
+  print("payload:")
+  hexdump(payload)
   SendPayload(ip, payload)
 
 if __name__ == "__main__":
