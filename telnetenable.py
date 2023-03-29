@@ -33,6 +33,10 @@ warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
 
 TELNET_PORT = 23
 
+def fatal_error(message):
+  sys.stderr.write(message + "\n")
+  sys.exit(1)
+
 # The version of Blowfish supplied for the telenetenable.c implementation
 # assumes Big-Endian data, but the code does nothing to convert the
 # little-endian stuff it's getting on intel to Big-Endian
@@ -123,6 +127,10 @@ def main():
   args = sys.argv[1:]
   if len(args) < 3 or len(args) > 4:
     print("usage: python telnetenable.py <ip> <mac> <username> [<password>]")
+    print()
+    print("to auto-detect the MAC address, pass an empty string for mac")
+    print("example:")
+    print("python telnetenable.py 192.168.0.1 \"\" admin password")
     sys.exit(1)
 
   ip = args[0]
@@ -132,6 +140,17 @@ def main():
   password = ""
   if len(args) == 4:
     password = args[3]
+
+  if mac == "":
+    print(f"getting MAC address of {ip} ...")
+    from getmac import get_mac_address
+    mac = get_mac_address(ip=ip)
+    if mac == None:
+      fatal_error(
+        f"failed to get MAC address. try running as root:\n" +
+        f"sudo {' '.join(sys.argv)}"
+      )
+    print(f"getting MAC address of {ip} done: {mac}")
 
   payload = GeneratePayload(mac, username, password)
   print("payload:")
