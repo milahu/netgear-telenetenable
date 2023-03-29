@@ -109,6 +109,7 @@ def main():
   args = sys.argv[1:]
   if len(args) < 3 or len(args) > 4:
     print("usage: python telnetenable.py <ip> <mac> <username> [<password>]")
+    sys.exit(1)
 
   ip = args[0]
   mac = args[1]
