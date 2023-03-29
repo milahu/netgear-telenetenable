@@ -24,8 +24,12 @@ import sys
 import socket
 import array
 from optparse import OptionParser
-from Crypto.Cipher import Blowfish
+import warnings
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.utils import CryptographyDeprecationWarning
 from Crypto.Hash import MD5
+
+warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
 
 TELNET_PORT = 23
 
@@ -71,7 +75,10 @@ def GeneratePayload(mac, username, password=""):
   
   secret_key = "AMBIT_TELNET_ENABLE+" + password
 
-  return ByteSwap(Blowfish.new(secret_key, 1).encrypt(payload))
+  cipher = Cipher(algorithms.Blowfish(secret_key.encode("ascii")), modes.ECB())
+  encryptor = cipher.encryptor()
+  payload_encrypted = encryptor.update(payload) + encryptor.finalize()
+  return ByteSwap(payload_encrypted)
 
 
 def SendPayload(ip, payload):
