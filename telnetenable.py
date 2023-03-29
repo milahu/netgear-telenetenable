@@ -114,4 +114,5 @@ def main():
   payload = GeneratePayload(mac, username, password)
   SendPayload(ip, payload)
 
-main()
+if __name__ == "__main__":
+  main()
